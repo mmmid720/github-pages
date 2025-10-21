@@ -11,11 +11,19 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-
-const basePath = process.env.NODE_ENV === "production" ? "/github-pages" : "";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -53,34 +61,34 @@ export default function HomePage() {
                 isSearchOpen ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
               }`}
             >
-              <a
-                href="#about"
+              <Link
+                href="/about"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full hover:bg-accent transition-colors text-xs"
               >
                 <Info className="w-3.5 h-3.5" />
                 <span>About</span>
-              </a>
-              <a
-                href="#headphones"
+              </Link>
+              <Link
+                href="/headphones"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full hover:bg-accent transition-colors text-xs"
               >
                 <Headphones className="w-3.5 h-3.5" />
                 <span>Headphones</span>
-              </a>
-              <a
-                href="#speakers"
+              </Link>
+              <Link
+                href="/speakers"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full hover:bg-accent transition-colors text-xs"
               >
                 <Speaker className="w-3.5 h-3.5" />
                 <span>Speakers</span>
-              </a>
-              <a
-                href="#dac-amp"
+              </Link>
+              <Link
+                href="/dac-amp"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full hover:bg-accent transition-colors text-xs"
               >
                 <RadioReceiver className="w-3.5 h-3.5" />
                 <span>DAC/AMP</span>
-              </a>
+              </Link>
             </div>
 
             {/* Divider */}
@@ -100,15 +108,20 @@ export default function HomePage() {
                 <Search className="w-3.5 h-3.5" />
               </button>
             ) : (
-              <div className="flex items-center gap-1.5 flex-1 transition-all duration-300">
+              <form
+                onSubmit={handleSearch}
+                className="flex items-center gap-1.5 flex-1 transition-all duration-300"
+              >
                 <Search className="w-3.5 h-3.5 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search audio gear..."
                   autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1 w-full placeholder:text-muted-foreground"
                 />
-              </div>
+              </form>
             )}
 
             {/* Divider before close button */}
@@ -149,10 +162,7 @@ export default function HomePage() {
                 if (el) el.playbackRate = 1.2;
               }}
             >
-              <source
-                src={`${basePath}/videos/hero-video.mp4`}
-                type="video/mp4"
-              />
+              <source src="/videos/hero-video.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
             {/* Overlay gradient */}
@@ -218,7 +228,7 @@ export default function HomePage() {
               <div className="group border border-border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:-translate-y-2">
                 <div className="aspect-square bg-white relative overflow-hidden">
                   <img
-                    src={`${basePath}/images/sony_mdr-mv1.png`}
+                    src="/github-pages/images/sony_mdr-mv1.png"
                     alt="Sony MDR-MV1"
                     className="w-full h-full object-cover scale-105"
                   />
@@ -245,7 +255,7 @@ export default function HomePage() {
                 <div className="aspect-square bg-white relative overflow-hidden flex items-center justify-center">
                   <img
                     src="https://shop-phinf.pstatic.net/20240909_42/1725856210766Aagq6_JPEG/5008662949499416_1019478271.jpg?type=m510"
-                    alt="Sony MDR-MV1"
+                    alt="B&W Px7 s2e"
                     className="w-4/5 h-4/5 object-contain"
                   />
                 </div>
@@ -307,7 +317,7 @@ export default function HomePage() {
               <div className="group border border-border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:-translate-y-2">
                 <div className="aspect-square bg-white relative overflow-hidden">
                   <img
-                    src={`${basePath}/images/marshall_woburn-iii.png`}
+                    src="/github-pages/images/marshall_woburn-iii.png"
                     alt="Marshall Woburn III"
                     className="w-full h-full object-cover"
                   />

@@ -13,3 +13,57 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Headphone {
+  id          String   @id @default(cuid())
+  brand       String   // 브랜드명 (e.g., "Sennheiser", "Sony", "B&W")
+  model       String   // 모델명 (e.g., "HD 660S2", "MDR-MV1")
+  fullName    String   // 전체 제품명 (검색용)
+  description String   // 제품 설명
+  price       Int      // 가격 (원 단위)
+  imageUrl    String   // 이미지 URL
+  type        String   // 유형 (e.g., "유선", "무선", "유선/무선")
+  category    String   // 카테고리 (e.g., "오픈형", "폐쇄형", "블루투스")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([brand])
+  @@index([fullName])
+  @@index([type])
+}
+
+model Speaker {
+  id          String   @id @default(cuid())
+  brand       String   // 브랜드명 (e.g., "EDIFIER", "Marshall", "HarmanKardon")
+  model       String   // 모델명 (e.g., "MR4 EDIFIER", "Woburn III")
+  fullName    String   // 전체 제품명 (검색용)
+  description String   // 제품 설명
+  price       Int      // 가격 (원 단위)
+  imageUrl    String   // 이미지 URL
+  type        String   // 유형 (e.g., "유선", "무선", "유선/무선")
+  category    String   // 카테고리 (e.g., "스튜디오 모니터", "블루투스", "인테리어")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([brand])
+  @@index([fullName])
+  @@index([type])
+}
+
+model DacAmp {
+  id          String   @id @default(cuid())
+  brand       String   // 브랜드명 (e.g., "Qudelix", "Topping")
+  model       String   // 모델명 (e.g., "T71 USB DAC", "5K")
+  fullName    String   // 전체 제품명 (검색용)
+  description String   // 제품 설명
+  price       Int      // 가격 (원 단위)
+  imageUrl    String   // 이미지 URL
+  type        String   // 유형 (e.g., "유선", "무선", "유선/무선")
+  category    String   // 카테고리 (e.g., "USB DAC", "블루투스", "데스크탑")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([brand])
+  @@index([fullName])
+  @@index([type])
+}
