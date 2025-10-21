@@ -162,7 +162,10 @@ export default function HomePage() {
                 if (el) el.playbackRate = 1.2;
               }}
             >
-              <source src="/videos/hero-video.mp4" type="video/mp4" />
+              <source
+                src="/github-pages/videos/hero-video.mp4"
+                type="video/mp4"
+              />
               Your browser does not support the video tag.
             </video>
             {/* Overlay gradient */}

@@ -10,16 +10,86 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import headphonesData from "@/data/headphones.json";
+import speakersData from "@/data/speakers.json";
+import dacAmpsData from "@/data/dacAmps.json";
+
+type AudioItem = {
+  brand: string;
+  model: string;
+  fullName: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  type: string;
+  category: string;
+  itemType: "headphone" | "speaker" | "dacAmp";
+};
 
 export default function SearchClient() {
+  const searchParams = useSearchParams();
   const [isSearchOpen, setIsSearchOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
+  useEffect(() => {
+    const query = searchParams.get("q");
+    if (query) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
+
+  const allItems: AudioItem[] = useMemo(() => {
+    return [
+      ...headphonesData.map((item) => ({ ...item, itemType: "headphone" as const })),
+      ...speakersData.map((item) => ({ ...item, itemType: "speaker" as const })),
+      ...dacAmpsData.map((item) => ({ ...item, itemType: "dacAmp" as const })),
+    ];
+  }, []);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+
+    const query = searchQuery.toLowerCase();
+    return allItems.filter(
+      (item) =>
+        item.brand.toLowerCase().includes(query) ||
+        item.model.toLowerCase().includes(query) ||
+        item.fullName.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query) ||
+        item.type.toLowerCase().includes(query)
+    );
+  }, [searchQuery, allItems]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // For static site, search functionality would need to be implemented client-side
-    // This is a placeholder for future implementation
+    // Search is handled by the useMemo above
+  };
+
+  const getItemLink = (item: AudioItem) => {
+    switch (item.itemType) {
+      case "headphone":
+        return "/headphones";
+      case "speaker":
+        return "/speakers";
+      case "dacAmp":
+        return "/dac-amp";
+    }
+  };
+
+  const getItemTypeLabel = (itemType: string) => {
+    switch (itemType) {
+      case "headphone":
+        return "헤드폰";
+      case "speaker":
+        return "스피커";
+      case "dacAmp":
+        return "DAC/AMP";
+      default:
+        return "";
+    }
   };
 
   return (
@@ -149,46 +219,109 @@ export default function SearchClient() {
         <main className="max-w-7xl mx-auto px-6 py-12 pt-32">
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-2">검색</h2>
-            <p className="text-muted-foreground">
-              검색 기능은 현재 개발 중입니다. 각 카테고리 페이지를 방문해주세요.
-            </p>
+            {searchQuery ? (
+              <p className="text-muted-foreground">
+                &quot;{searchQuery}&quot; 검색 결과:{" "}
+                <span className="font-semibold text-foreground">
+                  {searchResults.length}
+                </span>
+                개 제품
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                검색어를 입력하거나 카테고리를 선택해주세요.
+              </p>
+            )}
           </div>
 
-          {/* Categories */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <Link
-              href="/headphones"
-              className="group border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-            >
-              <Headphones className="w-12 h-12 mb-4 text-primary" />
-              <h3 className="text-xl font-bold mb-2">헤드폰</h3>
-              <p className="text-muted-foreground text-sm">
-                다양한 헤드폰 제품을 둘러보세요
+          {searchQuery && searchResults.length > 0 ? (
+            /* Search Results Grid */
+            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {searchResults.map((item, index) => (
+                <Link
+                  key={index}
+                  href={getItemLink(item)}
+                  className="group border border-border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:-translate-y-2"
+                >
+                  <div className="aspect-square bg-white relative overflow-hidden">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.fullName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs text-muted-foreground">
+                        {item.brand}
+                      </span>
+                      <span className="text-xs text-primary font-medium">
+                        {getItemTypeLabel(item.itemType)}
+                      </span>
+                    </div>
+                    <h4 className="text-base font-semibold mb-1.5">
+                      {item.model}
+                    </h4>
+                    <p className="text-muted-foreground text-xs mb-2 line-clamp-2">
+                      {item.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-primary">
+                        {item.price.toLocaleString()}원
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {item.type}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : searchQuery && searchResults.length === 0 ? (
+            /* No Results */
+            <div className="text-center py-12">
+              <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">
+                &quot;{searchQuery}&quot;에 대한 검색 결과가 없습니다.
               </p>
-            </Link>
+            </div>
+          ) : (
+            /* Categories */
+            <div className="grid md:grid-cols-3 gap-6">
+              <Link
+                href="/headphones"
+                className="group border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+              >
+                <Headphones className="w-12 h-12 mb-4 text-primary" />
+                <h3 className="text-xl font-bold mb-2">헤드폰</h3>
+                <p className="text-muted-foreground text-sm">
+                  다양한 헤드폰 제품을 둘러보세요
+                </p>
+              </Link>
 
-            <Link
-              href="/speakers"
-              className="group border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-            >
-              <Speaker className="w-12 h-12 mb-4 text-primary" />
-              <h3 className="text-xl font-bold mb-2">스피커</h3>
-              <p className="text-muted-foreground text-sm">
-                다양한 스피커 제품을 둘러보세요
-              </p>
-            </Link>
+              <Link
+                href="/speakers"
+                className="group border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+              >
+                <Speaker className="w-12 h-12 mb-4 text-primary" />
+                <h3 className="text-xl font-bold mb-2">스피커</h3>
+                <p className="text-muted-foreground text-sm">
+                  다양한 스피커 제품을 둘러보세요
+                </p>
+              </Link>
 
-            <Link
-              href="/dac-amp"
-              className="group border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-            >
-              <RadioReceiver className="w-12 h-12 mb-4 text-primary" />
-              <h3 className="text-xl font-bold mb-2">DAC/AMP</h3>
-              <p className="text-muted-foreground text-sm">
-                다양한 DAC/AMP 제품을 둘러보세요
-              </p>
-            </Link>
-          </div>
+              <Link
+                href="/dac-amp"
+                className="group border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+              >
+                <RadioReceiver className="w-12 h-12 mb-4 text-primary" />
+                <h3 className="text-xl font-bold mb-2">DAC/AMP</h3>
+                <p className="text-muted-foreground text-sm">
+                  다양한 DAC/AMP 제품을 둘러보세요
+                </p>
+              </Link>
+            </div>
+          )}
         </main>
       </div>
     </div>
