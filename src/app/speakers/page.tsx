@@ -1,14 +1,6 @@
-import { PrismaClient } from "@/generated/prisma";
 import SpeakersClient from "./SpeakersClient";
+import speakersData from "@/data/speakers.json";
 
-const prisma = new PrismaClient();
-
-export default async function SpeakersPage() {
-  const speakers = await prisma.speaker.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return <SpeakersClient speakers={speakers} />;
+export default function SpeakersPage() {
+  return <SpeakersClient speakers={speakersData} />;
 }

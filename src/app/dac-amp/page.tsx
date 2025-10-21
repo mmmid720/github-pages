@@ -1,14 +1,6 @@
-import { PrismaClient } from "@/generated/prisma";
 import DacAmpClient from "./DacAmpClient";
+import dacAmpsData from "@/data/dacAmps.json";
 
-const prisma = new PrismaClient();
-
-export default async function DacAmpPage() {
-  const dacAmps = await prisma.dacAmp.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return <DacAmpClient dacAmps={dacAmps} />;
+export default function DacAmpPage() {
+  return <DacAmpClient dacAmps={dacAmpsData} />;
 }

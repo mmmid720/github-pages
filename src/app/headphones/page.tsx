@@ -1,14 +1,6 @@
-import { PrismaClient } from "@/generated/prisma";
 import HeadphonesClient from "./HeadphonesClient";
+import headphonesData from "@/data/headphones.json";
 
-const prisma = new PrismaClient();
-
-export default async function HeadphonesPage() {
-  const headphones = await prisma.headphone.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return <HeadphonesClient headphones={headphones} />;
+export default function HeadphonesPage() {
+  return <HeadphonesClient headphones={headphonesData} />;
 }

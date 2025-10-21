@@ -14,7 +14,6 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 type Headphone = {
-  id: string;
   brand: string;
   model: string;
   fullName: string;
@@ -23,8 +22,6 @@ type Headphone = {
   imageUrl: string;
   type: string;
   category: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 type SortOption = "newest" | "price-asc" | "price-desc";
@@ -304,9 +301,9 @@ export default function HeadphonesClient({
             </div>
           ) : (
             <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredAndSortedHeadphones.map((headphone) => (
+              {filteredAndSortedHeadphones.map((headphone, index) => (
                 <div
-                  key={headphone.id}
+                  key={index}
                   className="group border border-border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:-translate-y-2"
                 >
                   <div className="aspect-square bg-white relative overflow-hidden">
