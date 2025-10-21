@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 
-const basePath = process.env.NODE_ENV === "production" ? "/audio-catalog" : "";
+const basePath = process.env.NODE_ENV === "production" ? "/github-pages" : "";
 
 export default function HomePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
