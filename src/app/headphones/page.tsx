@@ -1,6 +1,14 @@
 import HeadphonesClient from "./HeadphonesClient";
-import headphonesData from "@/data/headphones.json";
+import { prisma } from "@/lib/db";
 
-export default function HeadphonesPage() {
-  return <HeadphonesClient headphones={headphonesData} />;
+export const dynamic = "force-dynamic";
+
+export default async function HeadphonesPage() {
+  const headphones = await prisma.headphone.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return <HeadphonesClient headphones={headphones} />;
 }

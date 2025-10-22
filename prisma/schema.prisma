@@ -24,6 +24,7 @@ model Headphone {
   imageUrl    String   // 이미지 URL
   type        String   // 유형 (e.g., "유선", "무선", "유선/무선")
   category    String   // 카테고리 (e.g., "오픈형", "폐쇄형", "블루투스")
+  purchaseUrl String?  // 구매 링크 (선택 사항)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -42,6 +43,7 @@ model Speaker {
   imageUrl    String   // 이미지 URL
   type        String   // 유형 (e.g., "유선", "무선", "유선/무선")
   category    String   // 카테고리 (e.g., "스튜디오 모니터", "블루투스", "인테리어")
+  purchaseUrl String?  // 구매 링크 (선택 사항)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -60,6 +62,7 @@ model DacAmp {
   imageUrl    String   // 이미지 URL
   type        String   // 유형 (e.g., "유선", "무선", "유선/무선")
   category    String   // 카테고리 (e.g., "USB DAC", "블루투스", "데스크탑")
+  purchaseUrl String?  // 구매 링크 (선택 사항)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -12,11 +12,10 @@ import {
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import headphonesData from "@/data/headphones.json";
-import speakersData from "@/data/speakers.json";
-import dacAmpsData from "@/data/dacAmps.json";
+import DeviceModal from "@/components/DeviceModal";
 
-type AudioItem = {
+type BaseDevice = {
+  id: string;
   brand: string;
   model: string;
   fullName: string;
@@ -25,13 +24,31 @@ type AudioItem = {
   imageUrl: string;
   type: string;
   category: string;
+  purchaseUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type AudioItem = BaseDevice & {
   itemType: "headphone" | "speaker" | "dacAmp";
 };
 
-export default function SearchClient() {
+type SearchClientProps = {
+  headphones: BaseDevice[];
+  speakers: BaseDevice[];
+  dacAmps: BaseDevice[];
+};
+
+export default function SearchClient({
+  headphones,
+  speakers,
+  dacAmps,
+}: SearchClientProps) {
   const searchParams = useSearchParams();
   const [isSearchOpen, setIsSearchOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDevice, setSelectedDevice] = useState<AudioItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const query = searchParams.get("q");
@@ -42,11 +59,11 @@ export default function SearchClient() {
 
   const allItems: AudioItem[] = useMemo(() => {
     return [
-      ...headphonesData.map((item) => ({ ...item, itemType: "headphone" as const })),
-      ...speakersData.map((item) => ({ ...item, itemType: "speaker" as const })),
-      ...dacAmpsData.map((item) => ({ ...item, itemType: "dacAmp" as const })),
+      ...headphones.map((item) => ({ ...item, itemType: "headphone" as const })),
+      ...speakers.map((item) => ({ ...item, itemType: "speaker" as const })),
+      ...dacAmps.map((item) => ({ ...item, itemType: "dacAmp" as const })),
     ];
-  }, []);
+  }, [headphones, speakers, dacAmps]);
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -68,15 +85,14 @@ export default function SearchClient() {
     // Search is handled by the useMemo above
   };
 
-  const getItemLink = (item: AudioItem) => {
-    switch (item.itemType) {
-      case "headphone":
-        return "/headphones";
-      case "speaker":
-        return "/speakers";
-      case "dacAmp":
-        return "/dac-amp";
-    }
+  const handleCardClick = (item: AudioItem) => {
+    setSelectedDevice(item);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedDevice(null), 300);
   };
 
   const getItemTypeLabel = (itemType: string) => {
@@ -94,10 +110,10 @@ export default function SearchClient() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Dot pattern background */}
+      
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(var(--muted))_1px,transparent_0)] [background-size:24px_24px] opacity-40 pointer-events-none" />
 
-      {/* Header */}
+      
       <header className="fixed top-0 left-0 right-0 z-50">
         <div className="flex justify-center pt-16 px-4 pb-4">
           <div
@@ -106,7 +122,7 @@ export default function SearchClient() {
             }`}
             style={{ borderRadius: "2rem" }}
           >
-            {/* Home Button */}
+            
             <Link
               href="/"
               className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent transition-colors"
@@ -115,14 +131,14 @@ export default function SearchClient() {
               <Home className="w-3.5 h-3.5" />
             </Link>
 
-            {/* Divider */}
+            
             <div
               className={`w-px h-5 bg-border/40 transition-all duration-300 ${
                 isSearchOpen ? "opacity-0 w-0" : "opacity-100 w-px"
               }`}
             />
 
-            {/* Navigation - Hidden on mobile */}
+            
             <div
               className={`hidden sm:flex items-center gap-0 transition-all duration-300 ${
                 isSearchOpen ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
@@ -158,14 +174,14 @@ export default function SearchClient() {
               </Link>
             </div>
 
-            {/* Divider */}
+            
             <div
               className={`w-px h-5 bg-border/40 hidden sm:block transition-all duration-300 ${
                 isSearchOpen ? "opacity-0 w-0" : "opacity-100 w-px"
               }`}
             />
 
-            {/* Search Button / Search Bar */}
+            
             {!isSearchOpen ? (
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -191,14 +207,14 @@ export default function SearchClient() {
               </form>
             )}
 
-            {/* Divider before close button */}
+            
             <div
               className={`w-px h-5 bg-border/40 hidden sm:block transition-all duration-300 ${
                 isSearchOpen ? "opacity-100 w-px" : "opacity-0 w-0"
               }`}
             />
 
-            {/* Close Button */}
+            
             <button
               onClick={() => setIsSearchOpen(false)}
               className={`flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent transition-all duration-300 ${
@@ -215,7 +231,7 @@ export default function SearchClient() {
       </header>
 
       <div className="relative z-10">
-        {/* Main Content */}
+        
         <main className="max-w-7xl mx-auto px-6 py-12 pt-32">
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-2">검색</h2>
@@ -237,10 +253,10 @@ export default function SearchClient() {
           {searchQuery && searchResults.length > 0 ? (
             /* Search Results Grid */
             <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {searchResults.map((item, index) => (
-                <Link
-                  key={index}
-                  href={getItemLink(item)}
+              {searchResults.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => handleCardClick(item)}
                   className="group border border-border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:-translate-y-2"
                 >
                   <div className="aspect-square bg-white relative overflow-hidden">
@@ -274,7 +290,7 @@ export default function SearchClient() {
                       </span>
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           ) : searchQuery && searchResults.length === 0 ? (
@@ -324,6 +340,14 @@ export default function SearchClient() {
           )}
         </main>
       </div>
+
+      
+      <DeviceModal
+        device={selectedDevice}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        deviceType={selectedDevice?.itemType}
+      />
     </div>
   );
 }

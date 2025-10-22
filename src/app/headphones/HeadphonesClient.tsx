@@ -12,8 +12,10 @@ import {
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import DeviceModal from "@/components/DeviceModal";
 
 type Headphone = {
+  id: string;
   brand: string;
   model: string;
   fullName: string;
@@ -22,6 +24,9 @@ type Headphone = {
   imageUrl: string;
   type: string;
   category: string;
+  purchaseUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 type SortOption = "newest" | "price-asc" | "price-desc";
@@ -36,7 +41,19 @@ export default function HeadphonesClient({
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDevice, setSelectedDevice] = useState<Headphone | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+
+  const handleCardClick = (headphone: Headphone) => {
+    setSelectedDevice(headphone);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedDevice(null), 300);
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,10 +88,10 @@ export default function HeadphonesClient({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Dot pattern background */}
+      
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(var(--muted))_1px,transparent_0)] [background-size:24px_24px] opacity-40 pointer-events-none" />
 
-      {/* Header */}
+      
       <header className="fixed top-0 left-0 right-0 z-50">
         <div className="flex justify-center pt-16 px-4 pb-4">
           <div
@@ -83,7 +100,7 @@ export default function HeadphonesClient({
             }`}
             style={{ borderRadius: "2rem" }}
           >
-            {/* Home Button */}
+            
             <Link
               href="/"
               className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent transition-colors"
@@ -92,14 +109,14 @@ export default function HeadphonesClient({
               <Home className="w-3.5 h-3.5" />
             </Link>
 
-            {/* Divider */}
+            
             <div
               className={`w-px h-5 bg-border/40 transition-all duration-300 ${
                 isSearchOpen ? "opacity-0 w-0" : "opacity-100 w-px"
               }`}
             />
 
-            {/* Navigation - Hidden on mobile */}
+            
             <div
               className={`hidden sm:flex items-center gap-0 transition-all duration-300 ${
                 isSearchOpen ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
@@ -135,14 +152,14 @@ export default function HeadphonesClient({
               </Link>
             </div>
 
-            {/* Divider */}
+            
             <div
               className={`w-px h-5 bg-border/40 hidden sm:block transition-all duration-300 ${
                 isSearchOpen ? "opacity-0 w-0" : "opacity-100 w-px"
               }`}
             />
 
-            {/* Search Button / Search Bar */}
+            
             {!isSearchOpen ? (
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -168,14 +185,14 @@ export default function HeadphonesClient({
               </form>
             )}
 
-            {/* Divider before close button */}
+            
             <div
               className={`w-px h-5 bg-border/40 hidden sm:block transition-all duration-300 ${
                 isSearchOpen ? "opacity-100 w-px" : "opacity-0 w-0"
               }`}
             />
 
-            {/* Close Button */}
+            
             <button
               onClick={() => setIsSearchOpen(false)}
               className={`flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent transition-all duration-300 ${
@@ -192,7 +209,7 @@ export default function HeadphonesClient({
       </header>
 
       <div className="relative z-10">
-        {/* Main Content */}
+        
         <main className="max-w-7xl mx-auto px-6 py-12 pt-32">
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-2">헤드폰 카탈로그</h2>
@@ -201,7 +218,7 @@ export default function HeadphonesClient({
             </p>
           </div>
 
-          {/* Stats and Filters */}
+          
           <div className="mb-8 space-y-4">
             <div className="p-4 border border-border rounded-lg bg-background/50">
               <div className="text-sm text-muted-foreground">
@@ -213,9 +230,9 @@ export default function HeadphonesClient({
               </div>
             </div>
 
-            {/* Filter and Sort Controls */}
+            
             <div className="flex flex-wrap gap-3">
-              {/* Sort Controls */}
+              
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">정렬:</span>
                 <div className="flex gap-1">
@@ -252,7 +269,7 @@ export default function HeadphonesClient({
                 </div>
               </div>
 
-              {/* Filter Controls */}
+              
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">필터:</span>
                 <div className="flex gap-1">
@@ -291,7 +308,7 @@ export default function HeadphonesClient({
             </div>
           </div>
 
-          {/* Headphones Grid */}
+          
           {filteredAndSortedHeadphones.length === 0 ? (
             <div className="text-center py-12">
               <Headphones className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -301,9 +318,10 @@ export default function HeadphonesClient({
             </div>
           ) : (
             <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredAndSortedHeadphones.map((headphone, index) => (
+              {filteredAndSortedHeadphones.map((headphone) => (
                 <div
-                  key={index}
+                  key={headphone.id}
+                  onClick={() => handleCardClick(headphone)}
                   className="group border border-border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:-translate-y-2"
                 >
                   <div className="aspect-square bg-white relative overflow-hidden">
@@ -338,6 +356,14 @@ export default function HeadphonesClient({
           )}
         </main>
       </div>
+
+      
+      <DeviceModal
+        device={selectedDevice}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        deviceType="headphone"
+      />
     </div>
   );
 }
