@@ -1,13 +1,16 @@
 import type { NextConfig } from "next";
 
-const isProd = process.env.NODE_ENV === "production";
-
 const nextConfig: NextConfig = {
-  output: "export", // GitHub Pages를 위한 정적 export
-  basePath: isProd ? "/github-pages" : "", // GitHub Pages 리포지토리 이름과 일치
-  assetPrefix: isProd ? "/github-pages" : "",
+  // Vercel 배포를 위해 output: "export" 제거
+  // basePath, assetPrefix 제거 (루트 경로에서 배포)
   images: {
-    unoptimized: true, // 정적 export를 위해 이미지 최적화 비활성화
+    // Vercel에서는 이미지 최적화 지원
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
   },
   eslint: {
     ignoreDuringBuilds: false,
@@ -15,7 +18,6 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
-  trailingSlash: true, // GitHub Pages 호환성
 };
 
 export default nextConfig;

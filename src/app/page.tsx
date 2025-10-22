@@ -163,7 +163,7 @@ export default function HomePage() {
               }}
             >
               <source
-                src="/github-pages/videos/hero-video.mp4"
+                src="/videos/hero-video.mp4"
                 type="video/mp4"
               />
               Your browser does not support the video tag.
@@ -231,7 +231,7 @@ export default function HomePage() {
               <div className="group border border-border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:-translate-y-2">
                 <div className="aspect-square bg-white relative overflow-hidden">
                   <img
-                    src="/github-pages/images/sony_mdr-mv1.png"
+                    src="/images/sony_mdr-mv1.png"
                     alt="Sony MDR-MV1"
                     className="w-full h-full object-cover scale-105"
                   />
@@ -320,7 +320,7 @@ export default function HomePage() {
               <div className="group border border-border rounded-xl overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-2xl hover:-translate-y-2">
                 <div className="aspect-square bg-white relative overflow-hidden">
                   <img
-                    src="/github-pages/images/marshall_woburn-iii.png"
+                    src="/images/marshall_woburn-iii.png"
                     alt="Marshall Woburn III"
                     className="w-full h-full object-cover"
                   />
